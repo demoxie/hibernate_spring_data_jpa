@@ -5,19 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
 @Entity
-public class User {
+public class BookNatural {
     @Id
-    @GeneratedValue
-    private Long id;
-    private String name;
-
-
-
-
+    private String title;
+    private String isbn;
+    private String publisher;
 }
