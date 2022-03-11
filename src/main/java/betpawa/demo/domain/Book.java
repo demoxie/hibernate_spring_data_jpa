@@ -2,35 +2,36 @@ package betpawa.demo.domain;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
 public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String title;
     private String isbn;
     private String publisher;
-    private Long authorId;
 
-    public Book() {
-
+    public Author getAuthor() {
+        return authorId;
     }
 
-    public Book(String title, String isbn, String publisher, Long authorId) {
+    public void setAuthor(Author authorId) {
+        this.authorId = authorId;
+    }
+
+    @Transient
+    private Author authorId;
+
+    public Book(String title, String isbn, String publisher) {
         this.title = title;
         this.isbn = isbn;
         this.publisher = publisher;
-        this.authorId = authorId;
     }
 
     @Override
