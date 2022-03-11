@@ -8,6 +8,7 @@ import java.util.Objects;
 @Entity
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Book {
 
     @Id
@@ -17,32 +18,11 @@ public class Book {
     private String isbn;
     private String publisher;
     private Long authorId;
-    public Long getAuthorId() {
-        return authorId;
-    }
 
-    public void setAuthorId(Long authorId) {
-        this.authorId = authorId;
-    }
-    public Book(String title, String isbn, String publisher) {
+    public Book(String title, String isbn, String publisher, Long authorId) {
         this.title = title;
         this.isbn = isbn;
         this.publisher = publisher;
+        this.authorId = authorId;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Book book = (Book) o;
-
-        return Objects.equals(id, book.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
-    }
-
 }

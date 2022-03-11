@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.util.List;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
@@ -18,16 +17,8 @@ public class Author {
     private String firstName;
     private String lastName;
 
-    public List<Book> getBooks() {
-        return books;
+    public Author(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
-
-    public void setBooks(List<Book> books) {
-        this.books = books;
-    }
-
-    @Transient
-    private List<Book> books;
-
-
 }

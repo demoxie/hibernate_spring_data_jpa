@@ -1,63 +1,73 @@
 package betpawa.demo.dao;
 
 import betpawa.demo.domain.Author;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-@Component
-@Getter
-@Setter
-public class AuthorDaoImpl implements  AuthorDao{
-    private final JdbcTemplate jdbcTemplate;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 
-    public AuthorDaoImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+@Component
+@Data
+public class AuthorDaoImpl implements  AuthorDao{
+    private final EntityManagerFactory emf;
+
+    public AuthorDaoImpl(EntityManagerFactory emf) {
+        this.emf = emf;
     }
 
     @Override
     public Author getById(Long id) {
-        String sql = "select author.id as id, first_name, last_name, book.id as book_id, book.isbn, book.publisher, book.title from author\n" +
-                "left outer join book on author.id = book.author_id where author.id = ?";
-
-        return jdbcTemplate.query(sql, new AuthorExtractor(), id);
+        return getEntityManager().find(Author.class, id);
     }
 
     @Override
     public Author findAuthorByName(String firstName, String lastName) {
-        return jdbcTemplate.queryForObject("SELECT * FROM author WHERE first_name = ? and last_name = ?",
-                getRowMapper(),
-                firstName, lastName);
+        TypedQuery<Author> query = getEntityManager().createQuery("SELECT a FROM Author a " +
+                "WHERE a.firstName = :first_name and a.lastName = :last_name", Author.class);
+        query.setParameter("first_name", firstName);
+        query.setParameter("last_name", lastName);
+
+        return query.getSingleResult();
     }
 
     @Override
     public Author saveNewAuthor(Author author) {
-        jdbcTemplate.update("INSERT INTO author (first_name, last_name) VALUES (?, ?)",
-                author.getFirstName(), author.getLastName());
-
-        Long createdId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long.class);
-
-        return this.getById(createdId);
+        EntityManager em = getEntityManager();
+        em.getTransaction().begin();
+        em.persist(author);
+        em.flush();
+        em.getTransaction().commit();
+        return author;
     }
 
     @Override
     public Author updateAuthor(Author author) {
-
-        jdbcTemplate.update("UPDATE author SET first_name = ?, last_name = ? WHERE id = ?",
-                author.getFirstName(), author.getLastName(), author.getId());
-
-        return this.getById(author.getId());
+        EntityManager em = getEntityManager();
+        em.joinTransaction();
+        em.merge(author);
+        em.flush();
+        em.clear();
+        return em.find(Author.class, author.getId());
     }
 
     @Override
     public void deleteAuthorById(Long id) {
-        jdbcTemplate.update("DELETE FROM author WHERE id = ?", id);
+        EntityManager em = getEntityManager();
+        em.getTransaction().begin();
+        Author author = em.find(Author.class, id);
+        em.remove(author);
+        em.flush();
+        em.getTransaction().commit();
+
     }
 
-    private RowMapper<Author> getRowMapper(){
-        return new AuthorMapper();
+    private EntityManager getEntityManager(){
+        return emf.createEntityManager();
     }
-
 }
