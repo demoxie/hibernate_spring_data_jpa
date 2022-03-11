@@ -9,15 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ActiveProfiles("local")
 @DataJpaTest
 @ComponentScan(basePackages = {"betpawa.demo.dao"})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class AuthorDaoIntegrationTest {
+public class DaoIntegrationTest {
 
     @Autowired
     AuthorDao authorDao;
@@ -35,9 +37,9 @@ public class AuthorDaoIntegrationTest {
 
         bookDao.deleteBookById(saved.getId());
 
-        Book deleted = bookDao.getById(saved.getId());
-
-        assertThat(deleted).isNull();
+        assertThrows(EmptyResultDataAccessException.class, () -> {
+            bookDao.getById(saved.getId());
+        });
     }
 
     @Test
@@ -46,11 +48,7 @@ public class AuthorDaoIntegrationTest {
         book.setIsbn("1234");
         book.setPublisher("Self");
         book.setTitle("my book");
-
-        Author author = new Author();
-        author.setId(3L);
-
-        book.setAuthor(author);
+        book.setAuthorId(1L);
         Book saved = bookDao.saveNewBook(book);
 
         saved.setTitle("New Book");
@@ -67,11 +65,8 @@ public class AuthorDaoIntegrationTest {
         book.setIsbn("1234");
         book.setPublisher("Self");
         book.setTitle("my book");
+        book.setAuthorId(1L);
 
-        Author author = new Author();
-        author.setId(3L);
-
-        book.setAuthor(author);
         Book saved = bookDao.saveNewBook(book);
 
         assertThat(saved).isNotNull();
@@ -101,9 +96,9 @@ public class AuthorDaoIntegrationTest {
 
         authorDao.deleteAuthorById(saved.getId());
 
-        Author deleted = authorDao.getById(saved.getId());
-
-        assertThat(deleted).isNull();
+        assertThrows(EmptyResultDataAccessException.class, () -> {
+            authorDao.getById(saved.getId());
+        });
     }
 
     @Test
@@ -121,11 +116,14 @@ public class AuthorDaoIntegrationTest {
     }
 
     @Test
-    void testSaveAuthor() {
+    void testInsertAuthor() {
         Author author = new Author();
-        author.setFirstName("John");
-        author.setLastName("Thompson");
+        author.setFirstName("john");
+        author.setLastName("t222");
+
         Author saved = authorDao.saveNewAuthor(author);
+
+        System.out.println("New Id is: " + saved.getId());
 
         assertThat(saved).isNotNull();
     }
@@ -139,10 +137,7 @@ public class AuthorDaoIntegrationTest {
 
     @Test
     void testGetAuthor() {
-
-        Author author = authorDao.getById(1L);
-
-        assertThat(author).isNotNull();
-
+        Author author = authorDao.getById(26L);
+        assertThat(author.getId()).isNotNull();
     }
 }

@@ -16,18 +16,14 @@ public class Book {
     private String title;
     private String isbn;
     private String publisher;
-
-    public Author getAuthor() {
+    private Long authorId;
+    public Long getAuthorId() {
         return authorId;
     }
 
-    public void setAuthor(Author authorId) {
+    public void setAuthorId(Long authorId) {
         this.authorId = authorId;
     }
-
-    @Transient
-    private Author authorId;
-
     public Book(String title, String isbn, String publisher) {
         this.title = title;
         this.isbn = isbn;
