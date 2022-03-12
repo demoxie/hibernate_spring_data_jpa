@@ -1,10 +1,42 @@
-DROP DATABASE IF EXISTS bookdb2;
-DROP USER IF EXISTS `bookadmin`@`%`;
-DROP USER IF EXISTS `bookuser`@`%`;
-CREATE DATABASE IF NOT EXISTS bookdb2 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS `bookadmin`@`%` IDENTIFIED WITH mysql_native_password BY 'password';
-GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, EXECUTE, CREATE VIEW, SHOW VIEW,
-    CREATE ROUTINE, ALTER ROUTINE, EVENT, TRIGGER ON `bookdb2`.* TO `bookadmin`@`%`;
-CREATE USER IF NOT EXISTS `bookuser`@`%` IDENTIFIED WITH mysql_native_password BY 'password';
-GRANT SELECT, INSERT, UPDATE, DELETE, SHOW VIEW ON `bookdb2`.* TO `bookuser`@`%`;
-FLUSH PRIVILEGES;
+drop table if exists book cascade;
+drop table if exists author;
+
+create table book
+(
+    id        bigint not null auto_increment primary key,
+    isbn      varchar(255),
+    publisher varchar(255),
+    title     varchar(255),
+    author_id BIGINT
+) engine = InnoDB;
+
+create table author
+(
+    id         bigint not null auto_increment primary key,
+    first_name varchar(255),
+    last_name  varchar(255)
+) engine = InnoDB;
+
+alter table book
+    add constraint book_author_fk foreign key (author_id) references author (id);
+
+insert into author (first_name, last_name) values ('Craig', 'Walls');
+
+insert into book (isbn, publisher, title, author_id) values ('978-1617294945', 'Simon & Schuster',
+                                                             'Spring in Action, 5th Edition',(select id from author where first_name = 'Craig' and last_name = 'Walls') );
+
+insert into book (isbn, publisher, title, author_id) values ('978-1617292545', 'Simon & Schuster',
+                                                             'Spring Boot in Action, 1st Edition',(select id from author where first_name = 'Craig' and last_name = 'Walls') );
+
+insert into book (isbn, publisher, title, author_id) values ('978-1617297571', 'Simon & Schuster',
+                                                             'Spring in Action, 6th Edition',(select id from author where first_name = 'Craig' and last_name = 'Walls') );
+
+insert into author (first_name, last_name) values ('Eric', 'Evans');
+
+insert into book (isbn, publisher, title, author_id) values ('978-0321125217', 'Addison Wesley',
+                                                             'Domain-Driven Design',(select id from author where first_name = 'Eric' and last_name = 'Evans') );
+
+insert into author (first_name, last_name) values ('Robert', 'Martin');
+
+insert into book (isbn, publisher, title, author_id) values ('978-0134494166', 'Addison Wesley',
+                                                             'Clean Code',(select id from author where first_name = 'Robert' and last_name = 'Martin') );

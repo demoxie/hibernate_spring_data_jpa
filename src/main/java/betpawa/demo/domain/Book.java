@@ -5,10 +5,17 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.Objects;
 
-@Entity
-@Data
+
+
 @NoArgsConstructor
+@Getter
+@Setter
 @EqualsAndHashCode(of = "id")
+@NamedQueries({
+        @NamedQuery(name = "find_all_books", query = "FROM Book"),
+        @NamedQuery(name = "find_by_title", query = "FROM Book b where b.title = :title")
+})
+@Entity
 public class Book {
 
     @Id

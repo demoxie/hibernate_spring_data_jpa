@@ -5,10 +5,14 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.List;
 
+
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(of = "id")
+@NamedQueries({
+        @NamedQuery(name = "author_find_all", query = "FROM Author"),
+        @NamedQuery(name = "find_by_name", query = "FROM Author a WHERE a.firstName = :first_name and a.lastName = :last_name")
+})
 @Entity
 public class Author {
     @Id
