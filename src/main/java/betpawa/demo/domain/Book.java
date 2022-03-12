@@ -11,10 +11,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
-@NamedQueries({
-        @NamedQuery(name = "find_all_books", query = "FROM Book"),
-        @NamedQuery(name = "find_by_title", query = "FROM Book b where b.title = :title")
-})
+@NamedQuery(name = "Book.jpaNamed", query = "FROM Book b where b.title = :title")
 @Entity
 public class Book {
 
